@@ -1,0 +1,8 @@
+language: php
+php:
+  - hhvm
+  - hhvm-nightly
+
+install: composer install
+
+script: hhvm -v Eval.Jit=false vendor/bin/phpunit --configuration phpunit.xml
