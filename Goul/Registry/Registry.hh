@@ -20,8 +20,9 @@ class Registry
     public function get(string $key): mixed
     {
         if (!$this->data->contains($key)) {
-            $message = sprintf('Registry - No such key %s', $key);
-            throw new \InvalidArgumentException($message);
+            throw new \InvalidArgumentException(
+                sprintf('Registry - No such key %s', $key)
+            );
         }
 
         $setter = $this->data[$key]['setter'];
@@ -30,13 +31,10 @@ class Registry
                 $this->data[$key]['data'] = (new \ReflectionFunction($this->data[$key]['setter']))->invoke();
             } else {
                 $callable = new \ReflectionMethod($setter[0], $setter[1]);
-
-                // trying to call static method
-                if ($callable->isStatic()) {
-                    $this->data[$key]['data'] = $callable->invoke(null, $setter[1]);
-                } else {
-                    $this->data[$key]['data'] = $callable->invoke($setter[0], $setter[1]);
-                }
+                $this->data[$key]['data'] = $callable->invoke(
+                    $callable->isStatic() ? null : $setter[0],
+                    $setter[1]
+                );
             }
 
             $this->data[$key]['set']  = true;
@@ -48,8 +46,9 @@ class Registry
     public function set(string $key, mixed $val): this
     {
         if ($this->data->contains($key)) {
-            $message = sprintf('Registry - Cannot override key %s: key is already set.', $key);
-            throw new \RuntimeException($message);
+            throw new \RuntimeException(
+                sprintf('Registry - Cannot override key %s: key is already set.', $key)
+            );
         }
 
         $isCallable = is_callable($val);
