@@ -30,7 +30,8 @@ class Registry
             if (!is_array($setter)) {
                 $this->data[$key]['data'] = (new \ReflectionFunction($this->data[$key]['setter']))->invoke();
             } else {
-                $this->data[$key]['data'] = (new \ReflectionMethod($setter[0], $setter[1]))->invoke(
+                $callable = new \ReflectionMethod($setter[0], $setter[1]);
+                $this->data[$key]['data'] = $callable->invoke(
                     $callable->isStatic() ? null : $setter[0],
                     $setter[1]
                 );
